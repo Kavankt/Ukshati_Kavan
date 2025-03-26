@@ -1,85 +1,44 @@
+/* Import Tailwind if used */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Bubble Transitions */
-#bubbles {
-  --size: 250vw;
-  z-index: 9998;
-  pointer-events: none;
-}
-
-.bubbles__first,
-.bubbles__second {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, 100%);
-  width: var(--size);
-  height: var(--size);
-  border-radius: var(--size);
-  animation-timing-function: ease-in-out;
-}
-
-#bubbles.show .bubbles__first {
-  animation: bubble-move 1200ms;
-}
-
-#bubbles.show .bubbles__second {
-  animation: bubble-second-move 1200ms;
-}
-
-#bubbles.hide .bubbles__first,
-#bubbles.hide .bubbles__second {
-  opacity: 0;
-  transition: opacity 400ms;
-}
-
-@keyframes bubble-move {
-  20% { border-radius: var(--size); }
-  50%, 100% { transform: translate(-50%, 0); border-radius: 0; }
-}
-
-@keyframes bubble-second-move {
-  30% { transform: translate(-50%, 100%); }
-  50% { border-radius: var(--size); }
-  100% { transform: translate(-50%, 0); border-radius: 0; }
-}
-
-/* Add smooth transitions */
+/* Reset default browser styles */
 * {
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Apply default styles */
+html, body {
+  font-family: var(--font-geist-sans, sans-serif);
+  background-color: #f8f9fa; /* Light background */
+  color: #333; /* Dark text */
+  line-height: 1.6;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+/* Utility Classes */
+.text-center {
+  text-align: center;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Button Styling */
+button {
+  background-color: #007bff; /* Blue */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker blue */
 }
