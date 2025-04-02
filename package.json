@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "bcryptjs": "^3.0.2"
+    "bcryptjs": "^3.0.2",
+    "module": "^1.2.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
