@@ -1,85 +1,53 @@
-import { connectToDB } from "../../lib/db";
+const { handler } = require('../../../pages/api/tasks');
+const db = require('@/lib/db');
 
-export default async function handler(req, res) {
-  let connection;
-  try {
-    // Get a connection from the pool
-    connection = await connectToDB();
+// Correct mock implementation
+jest.mock('@/lib/db', () => ({
+  connectToDB: jest.fn(() => ({
+    query: jest.fn(),
+    release: jest.fn()
+  }))
+}));
 
-    if (req.method === "GET") {
-      const [projects] = await connection.query(`
-        SELECT p.*, c.cname AS customer_name 
-        FROM project p
-        LEFT JOIN customer c ON p.cid = c.cid
-        ORDER BY p.start_date DESC
-      `);
-      return res.status(200).json(projects);
-    }
+describe('Project API', () => {
+  let mockDb;
 
-    if (req.method === "POST") {
-      const { pname, start_date, end_date, status, cid } = req.body;
+  beforeEach(() => {
+    mockDb = {
+      query: jest.fn(),
+      release: jest.fn()
+    };
+    db.connectToDB.mockResolvedValue(mockDb);
+  });
 
-      if (!pname || !start_date || !end_date || !status || !cid) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
+  // Mock response helper
+  const mockResponse = () => {
+    const res = {};
+    res.status = jest.fn().mockReturnValue(res);
+    res.json = jest.fn().mockReturnValue(res);
+    res._getStatusCode = jest.fn().mockReturnValue(200);
+    res._getJSONData = jest.fn(() => res.json.mock.calls[0]?.[0] || {});
+    return res;
+  };
 
-      const [result] = await connection.query(
-        `INSERT INTO project (pname, start_date, end_date, status, cid) 
-         VALUES (?, ?, ?, ?, ?)`,
-        [pname, start_date, end_date, status, cid]
-      );
+  describe('GET /api/tasks', () => {
+    it('should return all projects with customer names', async () => {
+      const mockProjects = [
+        { pid: 1, pname: 'Project 1', cname: 'Customer A' }
+      ];
+      
+      mockDb.query.mockResolvedValue([mockProjects]);
 
-      return res.status(201).json({
-        pid: result.insertId,
-        pname,
-        start_date,
-        end_date,
-        status,
-        cid,
-      });
-    }
+      const req = { method: 'GET' };
+      const res = mockResponse();
 
-    if (req.method === "PUT") {
-      const { pid, pname, start_date, end_date, status, cid } = req.body;
+      await handler(req, res);
+      
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockProjects);
+    });
+  });
 
-      if (!pid || !pname || !start_date || !end_date || !status || !cid) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-      await connection.query(
-        `UPDATE project 
-         SET pname = ?, start_date = ?, end_date = ?, status = ?, cid = ?
-         WHERE pid = ?`,
-        [pname, start_date, end_date, status, cid, pid]
-      );
-
-      return res.status(200).json({
-        pid,
-        pname,
-        start_date,
-        end_date,
-        status,
-        cid,
-      });
-    }
-
-    if (req.method === "DELETE") {
-      const { pid } = req.query;
-
-      if (!pid) {
-        return res.status(400).json({ error: "Project ID is required" });
-      }
-
-      await connection.query("DELETE FROM project WHERE pid = ?", [pid]);
-      return res.status(204).end();
-    }
-
-    res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-  } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ error: error.message || "Database operation failed" });
-  } finally {
-    // Release the connection back to the pool
-    if (connection) connection.release();
-  }
-}
+  // Add similar tests for other methods (POST, PUT, DELETE)
+  // following the same pattern
+});

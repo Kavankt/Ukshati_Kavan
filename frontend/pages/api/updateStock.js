@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 
 const dbConfig = {
-  host: process.env.DB_HOST,
+  host: process.env.DB_HOST, 
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     // Update stock
     await connection.execute(
       `UPDATE stock 
-       SET quantity = quantity + ?, price_pu = price_pu + ?
+       SET quantity = quantity + ?, price_pu = ?
        WHERE stock_id = ?`,
       [Number(quantity), parseFloat(price), stockId]
     );

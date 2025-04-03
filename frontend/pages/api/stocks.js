@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Quantity and price must be positive" });
       }
 
-      const normalizedProductName = productName.trim().toLowerCase(); // Normalize
+      const normalizedProductName = productName
 
       // Fetch category_id
       const [[category]] = await db.execute(
